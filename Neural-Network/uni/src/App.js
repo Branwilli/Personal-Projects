@@ -42,9 +42,9 @@ function App() {
           <Sidebar open={sidebarOpen} toggle={toggleSidebar} />
           <main className={`content ${sidebarOpen ? 'shifted' : ''}`}>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Dashboard />} />,
               <Route path="/courses" element={<Courses />} />,
-              <Route path="/finance" element={<Finance />} />
+              <Route path="/finance" element={<Finance />} />,
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </main>
