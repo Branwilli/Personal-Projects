@@ -1,10 +1,8 @@
 #Import Libraries
 import numpy
-#import tflearn 
 import tensorflow
 from tensorflow.keras import layers, models 
 from tensorflow.keras.models import load_model 
-#from tensorflow.keras.layers import Dense, Input
 import random 
 import json 
 import pickle
