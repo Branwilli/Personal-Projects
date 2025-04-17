@@ -8,6 +8,11 @@ import json
 import pickle
 import nltk 
 from nltk.stem.lancaster import LancasterStemmer
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 stemmer = LancasterStemmer() #Creates an instance of Lancaster Stemmer 
 
@@ -107,14 +112,17 @@ def bag_of_words(s, words):
     return numpy.array(bag)
 
 #Chat Function
+@app.route('/api/chat', methods=['POST'])
 def chat():
-    print("Weclome, start interacting with the bot! (type quit to exit)")
-    while True:
-        inp = input("You: ")
-        if inp.lower() == "quit":
-            break
+    #print("Weclome, start interacting with the bot! (type quit to exit)")
+    #while True:
+        #inp = input("You: ")
+    try:
+        user_input = request.json.get('message', '')
+        if user_input.lower() == "quit":
+            return jsonify({'response': 'Chat session ended', 'end_session': True})
 
-        input_data = bag_of_words(inp, words)
+        input_data = bag_of_words(user_input, words)
         output_data = model.call(input_data[None, :])[0]
         output_index = numpy.argmax(output_data)
         tag = labels[output_index]
@@ -123,9 +131,19 @@ def chat():
             for tg in data["intents"]:
                 if tg['tag'] == tag:
                     responses = tg['responses']
-            print(random.choice(responses))
+            bot_response = random.choice(responses)
 
         else: 
-            print("Sorry, I didn't get that, try again.")
+            bot_response = "Sorry, I didn't get that. Could you rephrase the question?"
 
-chat()
+        return jsonify({
+            'response': bot_response,
+            'tag': tag,
+            'confidence': float(output_data[output_index])
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
