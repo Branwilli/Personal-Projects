@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from indicators import add_features, standardize_df, filter_data
+from news import merge_df, sentiment_training_df
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -40,11 +41,15 @@ model = PredictionModel(len(features))
 model.load_state_dict(model_state)
 model.eval()
 
+s_df = sentiment_training_df('backtest_fundamentals')
+
 df = pd.read_csv('EURUSD5.csv', sep='\t', header=None)
 
 df = standardize_df(df)
 df = add_features(df)
 df = filter_data(df).dropna()
+
+df = merge_df(s_df, df)
 
 arima_model = ARIMA(df['close'], order=(2,1,2)).fit()
 df['arima_pred'] = arima_model.fittedvalues
