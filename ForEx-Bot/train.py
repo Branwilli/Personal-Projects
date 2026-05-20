@@ -12,11 +12,14 @@ from sklearn.preprocessing import StandardScaler
 
 from model import PredictionModel
 from indicators import add_features, add_targets, standardize_df, filter_data, smooth_labels
+from news import merge_df, sentiment_training_df
 import warnings
 
 warnings.filterwarnings('ignore')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+s_df = sentiment_training_df('training_fundamentals')
 
 df = pd.read_csv('EURUSD1.csv', sep='\t', header=None)
 
@@ -27,6 +30,8 @@ df = add_targets(df)
 df = df.dropna()
 
 df = filter_data(df).dropna()
+
+df = merge_df(s_df, df)
 
 arima_model = ARIMA(df['close'], order=(2,1,2)).fit()
 df['arima_pred'] = arima_model.fittedvalues
