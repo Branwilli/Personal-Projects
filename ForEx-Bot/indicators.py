@@ -158,3 +158,5 @@ def add_targets(df):
     )
     return df
 
+def smooth_labels(y, smoothing=0.1):
+    return y * (1-smoothing) + 0.5 * smoothing 
